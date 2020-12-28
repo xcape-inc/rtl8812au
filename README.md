@@ -26,7 +26,7 @@ Partially tested on kernels 5.8, 5.9, 5.10 with no dmesg badness, and wavemon wo
 ### Notes
 Download
 ```
-$ git clone -b v5.6.4.2 https://github.com/aircrack-ng/rtl8812au.git
+$ git clone -b v5.7.0 https://github.com/aircrack-ng/rtl8812au.git
 cd rtl*
 ```
 Package / Build dependencies (Kali)
