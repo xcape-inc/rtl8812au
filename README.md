@@ -1,15 +1,15 @@
-## Realtek rtl8812au driver version 5.9.3.2
+## Realtek rtl8812au driver version 5.7.0
 
 Supports 8811AU/8812AU and 8821AU chipsets.
 Realtek RTL8814AU is not supported in this anymore!
 
 [![Monitor mode](https://img.shields.io/badge/monitor%20mode-working-brightgreen.svg)](#)
 [![Frame Injection](https://img.shields.io/badge/frame%20injection-working-brightgreen.svg)](#)
-[![GitHub version](https://raster.shields.io/badge/version-v5.9.3.2-lightgrey.svg)](#)
+[![GitHub version](https://raster.shields.io/badge/version-v5.7.0-lightgrey.svg)](#)
 [![GitHub issues](https://img.shields.io/github/issues/aircrack-ng/rtl8812au.svg)](https://github.com/aircrack-ng/rtl8812au/issues)
 [![GitHub forks](https://img.shields.io/github/forks/aircrack-ng/rtl8812au.svg)](https://github.com/aircrack-ng/rtl8812au/network)
 [![GitHub stars](https://img.shields.io/github/stars/aircrack-ng/rtl8812au.svg)](https://github.com/aircrack-ng/rtl8812au/stargazers)
-[![Build Status](https://travis-ci.org/aircrack-ng/rtl8812au.svg?branch=v5.9.3.2)](https://travis-ci.org/aircrack-ng/rtl8812au)
+[![Build Status](https://travis-ci.org/aircrack-ng/rtl8812au.svg?branch=v5.7.0)](https://travis-ci.org/aircrack-ng/rtl8812au)
 [![GitHub license](https://img.shields.io/github/license/aircrack-ng/rtl8812au.svg)](https://github.com/aircrack-ng/rtl8812au/blob/master/LICENSE)
 <br>
 [![Kali](https://img.shields.io/badge/Kali-supported-blue.svg)](https://www.kali.org)
@@ -122,8 +122,8 @@ $ sudo service NetworkManager restart
 ### Credits / Contributors
 
 ```
-Alfa Networks - https://www.alfa.com.tw/
-Realtek.      - https://www.realtek.com
+Realtek       - https://www.realtek.com.tw
+Alfa Networks - https://www.alfa.com.tw
 aircrack-ng   - https://www.aircrack-ng.org
 
 astsam        - https://github.com/astsam
