@@ -1,6 +1,4 @@
-# rtl8812au-5.9.3.2
-
-## Realtek 8812AU driver version 5.9.3.2
+## Realtek rtl8812au driver version 5.9.3.2
 
 Supports 8811AU/8812AU and 8821AU chipsets.
 Realtek RTL8814AU is not supported in this anymore!
@@ -25,30 +23,87 @@ Builds clean with no errors on kernels 5.4, 5.8, 5.9, 5.10.
 Fully tested on kernel 5.4 with no dmesg badness, wavemon working fine, good speeds etc.
 Partially tested on kernels 5.8, 5.9, 5.10 with no dmesg badness, and wavemon working fine.
 
-### Building
+### Notes
+Download
+```
+$ git clone -b v5.6.4.2 https://github.com/aircrack-ng/rtl8812au.git
+cd rtl*
+```
+Package / Build dependencies (Kali)
+```
+$ sudo apt-get update
+$ sudo apt-get install build-essential libelf-dev linux-headers-`uname -r`
+```
+#### For Raspberry (RPI)
 
-To build and install module manually:
-```sh
-$ make
-$ sudo make install
+```
+$ sudo apt-get install raspberrypi-kernel-headers
 ```
 
-To use dkms install:
-
-```sh
-  (as root, or sudo) copy source folder contents to /usr/src/rtl8812au-5.9.3.2
+Then run this step to change platform in Makefile, For RPI 1/2/3/ & 0/Zero:
+```
+$ sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/g' Makefile
+$ sed -i 's/CONFIG_PLATFORM_ARM_RPI = n/CONFIG_PLATFORM_ARM_RPI = y/g' Makefile
 ```
 
-```sh
-$ sudo dkms add -m rtl8812au -v 5.9.3.2
-$ sudo dkms build -m rtl8812au -v 5.9.3.2
-$ sudo dkms install -m rtl8812au -v 5.9.3.2
+But for RPI 3B+ & 4B you will need to run those below which builds the ARM64 arch driver:
+```
+$ sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/g' Makefile
+$ sed -i 's/CONFIG_PLATFORM_ARM64_RPI = n/CONFIG_PLATFORM_ARM64_RPI = y/g' Makefile
 ```
 
-To use dkms uninstall and remove:
+For setting monitor mode
+  1. Fix problematic interference in monitor mode.
+  ```
+  $ airmon-ng check kill
+  ```
+  You may also uncheck the box "Automatically connect to this network when it is avaiable" in nm-connection-editor. This only works if you have a saved wifi connection.
+
+  2. Set interface down
+  ```
+  $ sudo ip link set wlan0 down
+  ```
+  3. Set monitor mode
+  ```
+  $ sudo iw dev wlan0 set type monitor
+  ```
+  4. Set interface up
+  ```
+  $ sudo ip link set wlan0 up
+  ```
+For setting TX power
+```
+$ sudo iw wlan0 set txpower fixed 3000
+```
+
+### LED control
+
+#### statically by module parameter in /etc/modprobe.d/8812au.conf or wherever, for example:
 
 ```sh
-$ sudo dkms remove -m rtl8812au -v 5.9.3.2 --all
+options 88XXau rtw_led_ctrl=0
+```
+value can be 0 or 1
+
+#### or dynamically by writing to /proc/net/rtl8812au/$(your interface name)/led_ctrl, for example:
+
+```sh
+$ echo "0" > /proc/net/rtl8812au/$(your interface name)/led_ctrl
+```
+value can be 0 or 1
+
+#### check current value:
+
+```sh
+$ cat /proc/net/rtl8812au/$(your interface name)/led_ctrl
+```
+
+### USB Mode Switch
+
+0: doesn't switch, 1: switch from usb2.0 to usb 3.0 2: switch from usb3.0 to usb 2.0
+```sh
+$ rmmod 88XXau
+$ modprobe 88XXau rtw_switch_usb_mode=int (0: no switch 1: switch from usb2 to usb3 2: switch from usb3 to usb2)
 ```
 
 ### NetworkManager
@@ -56,6 +111,27 @@ $ sudo dkms remove -m rtl8812au -v 5.9.3.2 --all
 As others have noted, people using NetworkManager need to add this stanza to /etc/NetworkManager/NetworkManager.conf
 
 ```sh
-  [device]
-  wifi.scan-rand-mac-address=no
+[device]
+wifi.scan-rand-mac-address=no
+```
+at the end of file /etc/NetworkManager/NetworkManager.conf and restart NetworkManager with the command:
+```
+$ sudo service NetworkManager restart
+```
+
+### Credits / Contributors
+
+```
+Alfa Networks - https://www.alfa.com.tw/
+Realtek.      - https://www.realtek.com
+aircrack-ng   - https://www.aircrack-ng.org
+
+astsam        - https://github.com/astsam
+evilphish     - https://github.com/evilphish
+fariouche     - https://github.com/fariouche
+CGarces       - https://github.com/CGarces
+ZerBea        - https://github.com/ZerBea
+lwfinger      - https://github.com/lwfinger
+Ulli-Kroll.   - https://github.com/Ulli-Kroll
+
 ```
