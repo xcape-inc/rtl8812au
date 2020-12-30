@@ -3835,7 +3835,6 @@ exit:
 }
 #endif
 
-
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 24))
 int recv_frame_monitor(_adapter *padapter, union recv_frame *rframe)
 {
