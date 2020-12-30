@@ -277,8 +277,14 @@ void rtw_regd_apply_flags(struct wiphy *wiphy)
 				ch = &sband->channels[j];
 
 				if (ch)
-					ch->flags &= ~(IEEE80211_CHAN_DISABLED|IEEE80211_CHAN_NO_HT40PLUS|IEEE80211_CHAN_NO_HT40MINUS);
-					//ch->flags = IEEE80211_CHAN_DISABLED;
+					ch->flags &= ~(IEEE80211_CHAN_DISABLED|IEEE80211_CHAN_NO_HT40PLUS|
+						IEEE80211_CHAN_NO_HT40MINUS|IEEE80211_CHAN_NO_80MHZ|
+						IEEE80211_CHAN_NO_160MHZ|
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 0))
+						IEEE80211_CHAN_NO_IBSS|IEEE80211_CHAN_PASSIVE_SCAN);
+#else
+						IEEE80211_CHAN_NO_IR);
+#endif
 			}
 		}
 	}
