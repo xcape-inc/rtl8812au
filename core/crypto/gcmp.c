@@ -41,7 +41,7 @@ static void gcmp_aad_nonce(const struct ieee80211_hdr *hdr, const u8 *data,
 	fc &= ~(WLAN_FC_RETRY | WLAN_FC_PWRMGT | WLAN_FC_MOREDATA);
 	WPA_PUT_LE16(aad, fc);
 	pos = aad + 2;
-	os_memcpy(pos, hdr->addr1, 3 * ETH_ALEN);
+	os_memcpy(pos, GetAddr1Ptr((u8 *)hdr), 3 * ETH_ALEN);
 	pos += 3 * ETH_ALEN;
 	seq = le_to_host16(hdr->seq_ctrl);
 	seq &= ~0xfff0; /* Mask Seq#; do not modify Frag# */
@@ -121,18 +121,18 @@ u8 * gcmp_decrypt(const u8 *tk, size_t tk_len, const struct ieee80211_hdr *hdr,
 }
 
 /**
- * gcmp_encrypt -
+ * gcmp_encrypt - 
  * @tk: the temporal key
  * @tk_len: length of @tk
- * @frame: the point to mac header, the frame including mac header and payload,
+ * @frame: the point to mac header, the frame including mac header and payload, 
  *         if @pn is NULL, then the frame including pn
- * @len: length of @frame
+ * @len: length of @frame 
  *         length = mac header + payload
  * @hdrlen: length of the mac header
  * @qos: pointer to the QOS field of the frame
  * @pn: packet number
  * @keyid: key id
- * @encrypted_len: length of the encrypted frame
+ * @encrypted_len: length of the encrypted frame 
  *                 including mac header, pn, payload and MIC
  */
 u8 * gcmp_encrypt(const u8 *tk, size_t tk_len, const u8 *frame, size_t len,
