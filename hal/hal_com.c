@@ -15457,7 +15457,7 @@ u8 * rtw_hal_set_8812a_vendor_ie(_adapter *padapter , u8 *pframe ,uint *frlen ) 
 	else
 		vendor_info[6] = RT_HT_CAP_USE_JAGUAR_BCUT;
 	pframe = rtw_set_ie(pframe, _VENDOR_SPECIFIC_IE_,vender_len,vendor_info , frlen);
-
+	
 	return pframe;
 }
 #endif /*CONFIG_RTL8812A*/
