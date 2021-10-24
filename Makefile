@@ -23,7 +23,7 @@ EXTRA_LDFLAGS += --strip-all -O3
 ########################## WIFI IC ############################
 CONFIG_RTL8812A = y
 CONFIG_RTL8821A = y
-CONFIG_RTL8814A = n
+CONFIG_RTL8814A = y
 ######################### Interface ###########################
 CONFIG_USB_HCI = y
 ########################### Android ###########################
@@ -178,7 +178,7 @@ ifeq ($(CONFIG_USB_HCI), y)
 HCI_NAME = usb
 endif
 
-ifeq ($(CONFIG_RTL8812A)_$(CONFIG_RTL8821A)_$(CONFIG_RTL8814A), y_y_n)
+ifeq ($(CONFIG_RTL8812A)$(CONFIG_RTL8821A)$(CONFIG_RTL8814A), y_y_y)
 
 EXTRA_CFLAGS += -DDRV_NAME=\"rtl88XXau\"
 ifeq ($(CONFIG_USB_HCI), y)
@@ -457,7 +457,7 @@ ifeq ($(CONFIG_RTL8814A), y)
 #EXTRA_CFLAGS += -DCONFIG_MP_VHT_HW_TX_MODE
 CONFIG_MP_VHT_HW_TX_MODE = n
 ##########################################
-#RTL871X = rtl8814a
+RTL871X = rtl8814a
 ifeq ($(CONFIG_USB_HCI), y)
 MODULE_NAME = 8814au
 endif
@@ -2298,16 +2298,16 @@ config_r:
 DRIVER_VERSION = $(shell grep "\#define DRIVERVERSION" include/rtw_version.h | awk '{print $$3}' | tr -d v\")
 
 dkms_install:
-	mkdir -p /usr/src/8812au-$(DRIVER_VERSION)
-	cp -r * /usr/src/8812au-$(DRIVER_VERSION)
-	dkms add -m 8812au -v $(DRIVER_VERSION)
-	dkms build -m 8812au -v $(DRIVER_VERSION)
-	dkms install -m 8812au -v $(DRIVER_VERSION)
+	mkdir -p /usr/src/8814au-$(DRIVER_VERSION)
+	cp -r * /usr/src/8814au-$(DRIVER_VERSION)
+	dkms add -m 8814au -v $(DRIVER_VERSION)
+	dkms build -m 8814au -v $(DRIVER_VERSION)
+	dkms install -m 8814au -v $(DRIVER_VERSION)
 	dkms status
 
 dkms_remove:
-	dkms remove 8812au/$(DRIVER_VERSION) --all
-	rm -rf /usr/src/8812au-$(DRIVER_VERSION)
+	dkms remove 8814au/$(DRIVER_VERSION) --all
+	rm -rf /usr/src/8814au-$(DRIVER_VERSION)
 
 .PHONY: modules clean
 
