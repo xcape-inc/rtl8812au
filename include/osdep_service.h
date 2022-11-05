@@ -58,14 +58,6 @@
 	#include <osdep_service_linux.h>
 #endif
 
-#ifdef PLATFORM_OS_XP
-	#include <osdep_service_xp.h>
-#endif
-
-#ifdef PLATFORM_OS_CE
-	#include <osdep_service_ce.h>
-#endif
-
 /* #include <rtw_byteorder.h> */
 
 #ifndef BIT
@@ -418,7 +410,11 @@ static __inline void thread_enter(char *name)
 	printf("%s", "RTKTHREAD_enter");
 #endif
 }
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 17, 0)
 void thread_exit(_completion *comp);
+#else
+void kthread_thread_exit(_completion *comp);
+#endif
 void _rtw_init_completion(_completion *comp);
 void _rtw_wait_for_comp_timeout(_completion *comp);
 void _rtw_wait_for_comp(_completion *comp);
