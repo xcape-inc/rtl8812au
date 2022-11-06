@@ -5,7 +5,9 @@ EXTRA_CFLAGS += -Wno-unused-variable
 EXTRA_CFLAGS += -Wno-unused-label
 #EXTRA_CFLAGS += -Wno-unused-parameter
 EXTRA_CFLAGS += -Wno-unused-function
-EXTRA_CFLAGS += -Wimplicit-fallthrough=0
+EXTRA_CFLAGS += -Wno-implicit-fallthrough
+#EXTRA_CFLAGS += -Wno-cast-function-type
+#EXTRA_CFLAGS += -Wno-error=cast-function-type
 #EXTRA_CFLAGS += -Wno-parentheses-equality
 #EXTRA_CFLAGS += -Wno-pointer-bool-conversion
 EXTRA_CFLAGS += -Wno-unknown-pragmas
@@ -66,6 +68,8 @@ CONFIG_RTW_REPEATER_SON = n
 CONFIG_RTW_WIFI_HAL = n
 CONFIG_ICMP_VOQ = n
 CONFIG_IP_R_MONITOR = n #arp VOQ and high rate
+# disable virtual intf for openwrt 21.02
+CONFIG_RTW_VIRTUAL_INTF = n
 ########################## Debug ###########################
 CONFIG_RTW_DEBUG = n
 # default log level is _DRV_INFO_ = 4,
@@ -165,6 +169,10 @@ CONFIG_CUSTOMER_HUAWEI_GENERAL = n
 
 CONFIG_DRVEXT_MODULE = n
 
+ifeq ("","$(wildcard MOK.der)")
+NO_SKIP_SIGN := y
+endif
+
 ifeq ($(CONFIG_RTL8812AU), )
 ifneq (,$(findstring /usr/lib/dkms,$(PATH)))
     export TopDIR ?= $(shell pwd)
@@ -178,7 +186,7 @@ ifeq ($(CONFIG_USB_HCI), y)
 HCI_NAME = usb
 endif
 
-ifeq ($(CONFIG_RTL8812A)$(CONFIG_RTL8821A)$(CONFIG_RTL8814A), y_y_y)
+ifeq ($(CONFIG_RTL8812A)_$(CONFIG_RTL8821A)_$(CONFIG_RTL8814A), y_y_y)
 
 EXTRA_CFLAGS += -DDRV_NAME=\"rtl88XXau\"
 ifeq ($(CONFIG_USB_HCI), y)
@@ -1131,6 +1139,10 @@ endif
 
 EXTRA_CFLAGS += -DDM_ODM_SUPPORT_TYPE=0x04
 
+ifeq ($(CONFIG_RTW_VIRTUAL_INTF), y)
+EXTRA_CFLAGS += -DRTW_VIRTUAL_INTF=1
+endif
+
 ifeq ($(CONFIG_PLATFORM_I386_PC), y)
 EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
 EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
@@ -1190,6 +1202,7 @@ endif
 
 ifeq ($(CONFIG_PLATFORM_PPC), y)
 EXTRA_CFLAGS += -DCONFIG_BIG_ENDIAN
+EXTRA_CFLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT
 SUBARCH := $(shell uname -m | sed -e s/ppc/powerpc/)
 ARCH ?= $(SUBARCH)
 CROSS_COMPILE ?=
@@ -2298,16 +2311,16 @@ config_r:
 DRIVER_VERSION = $(shell grep "\#define DRIVERVERSION" include/rtw_version.h | awk '{print $$3}' | tr -d v\")
 
 dkms_install:
-	mkdir -p /usr/src/8814au-$(DRIVER_VERSION)
-	cp -r * /usr/src/8814au-$(DRIVER_VERSION)
-	dkms add -m 8814au -v $(DRIVER_VERSION)
-	dkms build -m 8814au -v $(DRIVER_VERSION)
-	dkms install -m 8814au -v $(DRIVER_VERSION)
+	@mkdir -vp /usr/src/8812au-$(DRIVER_VERSION)
+	cp -r * /usr/src/8812au-$(DRIVER_VERSION)
+	dkms add -m 8812au -v $(DRIVER_VERSION)
+	+ dkms build -m 8812au -v $(DRIVER_VERSION)
+	dkms install -m 8812au -v $(DRIVER_VERSION)
 	dkms status
 
 dkms_remove:
-	dkms remove 8814au/$(DRIVER_VERSION) --all
-	rm -rf /usr/src/8814au-$(DRIVER_VERSION)
+	dkms remove 8812au/$(DRIVER_VERSION) --all
+	rm -rf /usr/src/8812au-$(DRIVER_VERSION)
 
 .PHONY: modules clean
 
@@ -2324,5 +2337,16 @@ clean:
 	cd platform ; rm -fr *.mod.c *.mod *.o .*.cmd *.ko
 	rm -fr Module.symvers ; rm -fr Module.markers ; rm -fr modules.order
 	rm -fr *.mod.c *.mod *.o .*.cmd *.ko *~
-	rm -fr .tmp_versions
+	rm -fr .tmp_versions *.der *.priv
 endif
+
+sign:
+ifeq ($(NO_SKIP_SIGN), y)
+	@openssl req -new -x509 -newkey rsa:2048 -keyout MOK.priv -outform DER -out MOK.der -nodes -days 36500 -subj "/CN=Custom MOK/"
+	@mokutil --import MOK.der
+else
+	echo "Skipping key creation"
+endif
+	@$(KSRC)/scripts/sign-file sha256 MOK.priv MOK.der 88XXau.ko
+
+sign-install: all sign install
